@@ -589,7 +589,20 @@
   function updateWheelVisual(){const seg=entryFor(selected).wheel?.segments;if(!seg)return;const mount=document.getElementById('wheel-svg');if(mount)mount.innerHTML=renderWheelSvg(seg);const av=document.getElementById('average');if(av)av.textContent=avg(seg);}
   function refreshWheelRows(){const seg=entryFor(selected).wheel?.segments;if(!seg)return;document.getElementById('segment-rows').innerHTML=seg.map(wheelRow).join('');document.getElementById('segment-count').textContent=seg.length+' segmentów';updateWheelVisual();}
   function refreshSubcategorySummary(){for(const el of document.querySelectorAll('[data-node-score]')){const s=findNode(el.dataset.nodeScore);if(s)el.textContent=displayScore(s.value);}updateWheelVisual();}
-  function exportJSON(){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`dziennik-zycia-${todayKey}.json`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);}
+  function exportJSON(){const d = new Date();
+  const p = n => String(n).padStart(2, '0');
+  const date = `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
+  const time = `${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
+
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(
+    [JSON.stringify(data, null, 2)],
+    {type: 'application/json'}
+  ));
+  a.download = `${date}_${time}-dziennik_zycia.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+  }
   function deleteEmptyDay(){const d=data.days[selected];if(d&&!d.wheel&&!d.events.length)delete data.days[selected];}
   document.addEventListener('click',e=>{
     const btn=e.target.closest('button[data-action]');if(!btn)return;
